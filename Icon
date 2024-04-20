@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trashcan and Pothole Detection</title>
+  <style>
+    /* CSS for map container */
+    #map {
+      height: 400px;
+      width: 100%;
+    }
+
+    /* CSS for buttons */
+    button {
+      padding: 10px 20px;
+      margin: 10px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    /* CSS for camera section */
+    #camera-section {
+      margin-top: 20px;
+    }
+
+    #camera-section h2 {
+      margin-bottom: 10px;
+    }
+
+    #fileInput {
+      display: none;
+    }
+
+    #preview {
+      max-width: 300px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Trashcan and Pothole Detection</h1>
+  
+  <!-- Map Section -->
+  <div id="map"></div>
+
+  <!-- Nearby Trashcans Button -->
+  <button onclick="locateNearbyTrashcans()">Locate Nearby Trashcans</button>
+
+  <!-- Camera Section -->
+  <div id="camera-section">
+    <h2>Report Issues</h2>
+    <input type="file" accept="image/*" id="fileInput">
+    <button onclick="takePicture()">Take Picture</button>
+    <img src="" id="preview" alt="Preview" style="display: none; max-width: 300px; margin-top: 10px;">
+  </div>
+
+  <!-- Mapbox JavaScript API -->
+  <script src="https://api.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.js"></script>
+  <link href="https://api.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.css" rel="stylesheet">
+  
+  <script>
+    // Initialize Mapbox map
+    mapboxgl.accessToken = 'pk.eyJ1IjoibWFhcmlqa2hhbjIxIiwiYSI6ImNsdjhlbjB3eDAyZmoyanFscXc5YWNobzUifQ.syCyf6B29jtNCv3w1J0dLg';
+    var map = new mapboxgl.Map({
+      container: 'map',
+      style: 'mapbox://styles/mapbox/streets-v11', // style URL
+      center: [-75.1652, 39.9526], // starting position [lng, lat]
+      zoom: 12 // starting zoom
+    });
+
+    // Function to locate nearby trashcans
+    function locateNearbyTrashcans() {
+      // Implement logic to locate nearby trashcans and update map markers
+      alert("Locating nearby trashcans...");
+    }
+
+    // Function to take a picture
+    function takePicture() {
+      const fileInput = document.getElementById('fileInput');
+      const preview = document.getElementById('preview');
+
+      fileInput.click();
+
+      fileInput.onchange = () => {
+        const file = fileInput.files[0];
+        const reader = new FileReader();
+
+        reader.onloadend = () => {
+          preview.src = reader.result;
+          preview.style.display = 'block';
+        };
+
+        if (file) {
+          reader.readAsDataURL(file);
+        }
+      };
+    }
+  </script>
+</body>
+</html>

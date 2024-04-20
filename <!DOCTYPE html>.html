@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trashcan and Pothole Detection</title>
+  
+  <!-- Include the Mapbox JavaScript library -->
+  <script src='https://api.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.js'></script>
+
+  <!-- Include the Mapbox CSS -->
+  <link href='https://api.mapbox.com/mapbox-gl-js/v2.6.1/mapbox-gl.css' rel='stylesheet' />
+
+  <style>
+    /* Reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    /* Fonts */
+    @font-face {
+      font-family: "Inter";
+      font-style: normal;
+      font-weight: 100 900;
+      font-display: swap;
+      src: url("/fonts/inter-var.woff2") format("woff2");
+    }
+
+    /* Colors */
+    :root {
+      --color-primary: #00185C; /* Dark blue */
+      --color-secondary: #949193; /* Gray */
+    }
+
+    /* Body */
+    body {
+      font-family: "Inter", sans-serif;
+      background-color: #f9f9f9; /* Light gray */
+      color: #333; /* Dark gray */
+      line-height: 1.6;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* Container */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    /* Header */
+    .header {
+      background-color: var(--color-primary);
+      color: #fff;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .header h1 {
+      font-size: 2.5rem;
+    }
+
+    /* Map Section */
+    #map {
+      height: 400px;
+      width: 100%;
+    }
+
+    /* Buttons */
+    .button-container {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .button-container button {
+      padding: 12px 24px;
+      margin: 10px;
+      background-color: var(--color-primary);
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1.2rem;
+    }
+
+    .button-container button:hover {
+      background-color: var(--color-secondary);
+    }
+
+    /* Camera Section */
+    .camera-section {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .camera-section h2 {
+      margin-bottom: 10px;
+    }
+
+    #fileInput {
+      display: none;
+    }
+
+    #preview {
+      max-width: 300px;
+      margin-top: 10px;
+    }
+
+    #cameraStream {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Trashcan and Pothole Detection</h1>
+    </div>
+
+    <!-- Map Section -->
+    <div id="map"></div>
+
+    <!-- Buttons -->
+    <div class="button-container">
+      <button onclick="locateNearbyTrashcans()">Locate Nearby Trashcans</button>
+    </div>
+
+    <!-- Camera Section -->
+    <div class="camera-section">
+      <h2>Report Issues</h2>
+      <button onclick="takePicture()">Take Picture</button>
+      <video id="cameraStream"></video>
+      <canvas id="canvas" style="display: none;"></canvas>
+      <img src="" id="preview" alt="Preview" style="display: none; max-width: 300px; margin-top: 10px;">
+    </div>
+  </div>
+
+  <!-- JavaScript for Trashcan and Pothole Detection web app -->
+  <script>
+    // Initialize Mapbox map
+    mapboxgl.accessToken = 'pk.eyJ1IjoibWFhcmlqa2hhbjIxIiwiYSI6ImNsdjhlbjB3eDAyZmoyanFscXc5YWNobzUifQ.syCyf6B29jtNCv3w1J0dLg';
+    var map = new mapboxgl.Map({
+      container: 'map',
+      style: 'mapbox://styles/mapbox/streets-v11', // style URL
+      center: [-75.1652, 39.9526], // starting position [lng, lat]
+      zoom: 12 // starting zoom
+    });
+
+    // Function to locate nearby trashcans
+    function locateNearbyTrashcans() {
+      // Open Google Maps for Philadelphia
+      window.open('https://www.google.com/maps/place/Philadelphia');
+    }
+
+    // Function to take a picture
+    function takePicture() {
+      const cameraStream = document.getElementById('cameraStream');
+      const canvas = document.getElementById('canvas');
+      const context = canvas.getContext('2d');
+  
+      // Try to access the camera
+      navigator.mediaDevices.getUserMedia({ video: true })
+        .then(function (stream) {
+          cameraStream.srcObject = stream;
+          cameraStream.play();
+        })
+        .catch(function (err) {
+          console.log("An error occurred: " + err);
+        });
+  
+      // Take picture when button is clicked
+      document.getElementById('fileInput').addEventListener('change', function (e) {
+        const selectedFile = e.target.files[0];
+        const imageType = /image.*/;
+  
+        if (selectedFile.type.match(imageType)) {
+          const reader = new FileReader();
+  
+          reader.onload = function (e) {
+            const img = new Image();
+            img.src = reader.result;
+  
+            img.onload = function () {
+              canvas.width = img.width;
+              canvas.height = img.height;
+              context.drawImage(img, 0, 0);
+              const dataURL = canvas.toDataURL('image/jpeg');
+              document.getElementById('preview').src = dataURL;
+              document.getElementById('preview').style.display = 'inline';
+              document.getElementById('canvas').style.display = 'none';
+              cameraStream.style.display = 'none';
+              cameraStream.srcObject.getTracks()[0].stop();
+            }
+          };
+  
+          reader.readAsDataURL(selectedFile);
+        } else {
+          alert('File type not supported. Please select an image file.');
+        }
+      });
+    }
+  </script>
+</body>
+</html>
